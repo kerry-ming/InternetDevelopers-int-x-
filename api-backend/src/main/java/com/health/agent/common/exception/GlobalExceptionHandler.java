@@ -61,7 +61,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ApiResponse<?> handleException(Exception e) {
         log.error("系统异常: ", e);
-        return ApiResponse.fail(999, "系统错误，请联系管理员");
+        // 开发环境返回详细错误信息，生产环境返回通用错误
+        String message = "系统错误，请联系管理员";
+        String activeProfile = System.getProperty("spring.profiles.active", "");
+        if (activeProfile.contains("dev") || activeProfile.isEmpty()) {
+            String errorMsg = e.getMessage();
+            if (errorMsg != null && !errorMsg.isEmpty()) {
+                message = "系统错误: " + errorMsg;
+            }
+        }
+        return ApiResponse.fail(999, message);
     }
 
     private String getRootMessage(Throwable t) {

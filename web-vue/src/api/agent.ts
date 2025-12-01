@@ -1,0 +1,97 @@
+import { http } from '@/utils/http'
+
+export interface ModelConfig {
+  provider: string
+  model: string
+  temperature?: number
+  maxTokens?: number
+}
+
+export interface AgentCreateRequest {
+  name: string
+  description?: string
+  systemPrompt: string
+  userPromptTemplate?: string
+  modelConfig: ModelConfig
+  workflowId?: number
+  knowledgeBaseIds?: number[]
+  pluginIds?: number[]
+}
+
+export interface AgentUpdateRequest {
+  name?: string
+  description?: string
+  systemPrompt?: string
+  userPromptTemplate?: string
+  modelConfig?: ModelConfig
+  workflowId?: number
+  knowledgeBaseIds?: number[]
+  pluginIds?: number[]
+}
+
+export interface AgentListQuery {
+  pageNo?: number
+  pageSize?: number
+  keyword?: string
+  status?: string
+}
+
+export interface AgentVO {
+  id: number
+  name: string
+  description?: string
+  systemPrompt?: string
+  userPromptTemplate?: string
+  modelConfig?: ModelConfig
+  workflowId?: number
+  knowledgeBaseIds?: number[]
+  pluginIds?: number[]
+  status: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface PageResponse<T> {
+  total: number
+  pageNo: number
+  pageSize: number
+  records: T[]
+}
+
+export interface AgentTestRequest {
+  question: string
+}
+
+export interface AgentTestResponse {
+  reply: string
+  elapsedMs: number
+  promptTokens: number
+  completionTokens: number
+}
+
+export const createAgent = (data: AgentCreateRequest): Promise<number> => {
+  return http.post('/api/agents', data)
+}
+
+export const updateAgent = (id: number, data: AgentUpdateRequest): Promise<void> => {
+  return http.put(`/api/agents/${id}`, data)
+}
+
+export const getAgent = (id: number): Promise<AgentVO> => {
+  return http.get(`/api/agents/${id}`)
+}
+
+export const fetchAgents = (query?: AgentListQuery): Promise<PageResponse<AgentVO>> => {
+  return http.get('/api/agents', { params: query })
+}
+
+export const publishAgent = (id: number): Promise<void> => {
+  return http.post(`/api/agents/${id}/publish`)
+}
+
+export const testAgent = (id: number, data: AgentTestRequest): Promise<AgentTestResponse> => {
+  return http.post(`/api/agents/${id}/test`, data)
+}
+
+
+

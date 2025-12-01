@@ -1,16 +1,16 @@
 -- 精简版数据库初始化脚本，仅保留与“用户/权限”相关的表
--- 数据库: agent_db
+-- 数据库: ai_platform
 
 -- 设置字符集
 SET NAMES utf8mb4;
 SET CHARACTER SET utf8mb4;
 
 -- 创建数据库时指定字符集
-CREATE DATABASE IF NOT EXISTS agent_db
+CREATE DATABASE IF NOT EXISTS ai_platform
 DEFAULT CHARACTER SET utf8mb4 
 COLLATE utf8mb4_unicode_ci;
 
-USE agent_db;
+USE ai_platform;
 
 -- 1. 用户表（保留用户核心字段）
 CREATE TABLE IF NOT EXISTS `user` (

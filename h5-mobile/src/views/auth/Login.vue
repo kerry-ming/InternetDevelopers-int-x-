@@ -82,7 +82,7 @@ async function onSubmit() {
     
     // 延迟跳转，确保状态已保存
     setTimeout(() => {
-      const redirect = route.query.redirect || '/home'
+      const redirect = route.query.redirect || '/console/agents'
       router.replace(redirect)
     }, 500)
     

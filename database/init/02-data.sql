@@ -5,11 +5,11 @@ SET NAMES utf8mb4;
 SET CHARACTER SET utf8mb4;
 
 -- 创建数据库时指定字符集
-CREATE DATABASE IF NOT EXISTS agent_db
+CREATE DATABASE IF NOT EXISTS ai_platform
 DEFAULT CHARACTER SET utf8mb4 
 COLLATE utf8mb4_unicode_ci;
 
-USE agent_db;
+USE ai_platform;
 
 -- 管理员
 INSERT INTO `admin` (`username`, `password`, `nickname`, `email`, `status`) VALUES
