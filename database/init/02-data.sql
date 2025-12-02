@@ -27,5 +27,309 @@ INSERT INTO `user` (`username`, `password`, `nickname`, `email`, `status`) VALUE
 
 -- 说明：已移除所有与饮食/知识库/记录相关的插入语句，确保列与表结构一致。
 
+-- ============================================
+-- 插件初始数据
+-- ============================================
+
+-- 1. 内置插件：HTTP请求插件
+INSERT INTO `plugin` (`name`, `description`, `type`, `openapi_spec`, `config`, `status`) VALUES
+(
+    'HTTP请求插件',
+    '通用HTTP API调用插件，支持GET、POST、PUT、DELETE等方法',
+    'builtin',
+    '{
+        "openapi": "3.0.0",
+        "info": {
+            "title": "HTTP请求插件",
+            "description": "通用HTTP API调用",
+            "version": "1.0.0"
+        },
+        "paths": {
+            "/execute": {
+                "post": {
+                    "operationId": "httpRequest",
+                    "summary": "发送HTTP请求",
+                    "description": "向指定URL发送HTTP请求",
+                    "requestBody": {
+                        "required": true,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "url": {
+                                            "type": "string",
+                                            "description": "请求URL"
+                                        },
+                                        "method": {
+                                            "type": "string",
+                                            "enum": ["GET", "POST", "PUT", "DELETE"],
+                                            "description": "HTTP方法"
+                                        },
+                                        "headers": {
+                                            "type": "object",
+                                            "description": "请求头"
+                                        },
+                                        "body": {
+                                            "type": "object",
+                                            "description": "请求体"
+                                        }
+                                    },
+                                    "required": ["url", "method"]
+                                }
+                            }
+                        }
+                    },
+                    "responses": {
+                        "200": {
+                            "description": "成功",
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "type": "object",
+                                        "properties": {
+                                            "statusCode": {"type": "integer"},
+                                            "body": {"type": "object"}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }',
+    '{}',
+    'enabled'
+);
+
+-- 2. 示例插件：天气查询插件（自定义插件示例）
+INSERT INTO `plugin` (`name`, `description`, `type`, `openapi_spec`, `config`, `status`) VALUES
+(
+    '天气查询插件',
+    '查询城市天气信息',
+    'custom',
+    '{
+        "openapi": "3.0.0",
+        "info": {
+            "title": "天气查询API",
+            "description": "获取城市天气信息",
+            "version": "1.0.0"
+        },
+        "servers": [
+            {
+                "url": "https://api.weatherapi.com/v1",
+                "description": "天气API服务器"
+            }
+        ],
+        "paths": {
+            "/current.json": {
+                "get": {
+                    "operationId": "getCurrentWeather",
+                    "summary": "获取当前天气",
+                    "description": "根据城市名称获取当前天气信息",
+                    "parameters": [
+                        {
+                            "name": "key",
+                            "in": "query",
+                            "description": "API密钥",
+                            "required": true,
+                            "schema": {
+                                "type": "string"
+                            }
+                        },
+                        {
+                            "name": "q",
+                            "in": "query",
+                            "description": "城市名称",
+                            "required": true,
+                            "schema": {
+                                "type": "string"
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "成功",
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "type": "object",
+                                        "properties": {
+                                            "location": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {"type": "string"},
+                                                    "country": {"type": "string"}
+                                                }
+                                            },
+                                            "current": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "temp_c": {"type": "number"},
+                                                    "condition": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "text": {"type": "string"}
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }',
+    '{"apiKey": "your-api-key-here"}',
+    'disabled'
+);
+
+-- 插入内置插件：数据转换插件
+INSERT INTO `plugin` (`name`, `description`, `type`, `openapi_spec`, `config`, `status`) VALUES (
+    '数据转换插件',
+    '提供JSON数据提取和字符串格式化功能',
+    'builtin',
+    '{
+        "openapi": "3.0.0",
+        "info": {
+            "title": "数据转换插件",
+            "description": "内置数据转换工具",
+            "version": "1.0.0"
+        },
+        "paths": {
+            "/extract": {
+                "post": {
+                    "operationId": "extract",
+                    "summary": "提取JSON数据",
+                    "description": "使用JSONPath提取数据",
+                    "requestBody": {
+                        "required": true,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "source": {
+                                            "description": "源数据（JSON字符串或对象）"
+                                        },
+                                        "path": {
+                                            "type": "string",
+                                            "description": "JSONPath表达式，如: $.user.name"
+                                        }
+                                    },
+                                    "required": ["source", "path"]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "/format": {
+                "post": {
+                    "operationId": "format",
+                    "summary": "格式化字符串",
+                    "description": "使用模板格式化字符串",
+                    "requestBody": {
+                        "required": true,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "template": {
+                                            "type": "string",
+                                            "description": "模板字符串，如: Hello {name}"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "description": "数据对象"
+                                        }
+                                    },
+                                    "required": ["template"]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }',
+    '{}',
+    'enabled'
+);
+
+-- 插入内置插件：条件判断插件
+INSERT INTO `plugin` (`name`, `description`, `type`, `openapi_spec`, `config`, `status`) VALUES (
+    '条件判断插件',
+    '提供条件比较和逻辑判断功能',
+    'builtin',
+    '{
+        "openapi": "3.0.0",
+        "info": {
+            "title": "条件判断插件",
+            "description": "内置逻辑判断工具",
+            "version": "1.0.0"
+        },
+        "paths": {
+            "/compare": {
+                "post": {
+                    "operationId": "compare",
+                    "summary": "比较两个值",
+                    "description": "支持多种比较运算符",
+                    "requestBody": {
+                        "required": true,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "val1": {
+                                            "description": "第一个值"
+                                        },
+                                        "val2": {
+                                            "description": "第二个值"
+                                        },
+                                        "op": {
+                                            "type": "string",
+                                            "description": "运算符: eq(等于), ne(不等于), gt(大于), lt(小于), ge(大于等于), le(小于等于), contains(包含)",
+                                            "default": "eq"
+                                        }
+                                    },
+                                    "required": ["val1", "val2"]
+                                }
+                            }
+                        }
+                    },
+                    "responses": {
+                        "200": {
+                            "description": "比较结果",
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "type": "object",
+                                        "properties": {
+                                            "result": {
+                                                "type": "boolean"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }',
+    '{}',
+    'enabled'
+);
+
 
 

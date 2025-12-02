@@ -45,7 +45,7 @@ api-backend/src/main/resources/application.yml
 
 # ===== 按你的要求不上传的内容 =====
 # 1) 整个 docs 目录
-docs/
+#docs/
 
 # 2) 根目录下 html 文档目录
 html/
@@ -62,3 +62,7 @@ h5-mobile/dist/
 api-backend/target/
 rag-service/__pycache__/
 scripts/__pycache__/
+
+# ===== 数据库数据文件 =====
+database/redis/data/
+database/mysql/data/

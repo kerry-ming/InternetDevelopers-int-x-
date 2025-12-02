@@ -145,17 +145,23 @@ CREATE TABLE IF NOT EXISTS `document` (
 -- ============================================
 -- 5. 插件表 (plugin)
 -- 对应用户故事: US-010, US-011
+-- 智能体插件系统：支持 OpenAPI 3.0 规范的插件注册和管理
 -- ============================================
 CREATE TABLE IF NOT EXISTS `plugin` (
     `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
-    `name` VARCHAR(100) NOT NULL COMMENT '插件名称',
-    `description` VARCHAR(500) COMMENT '描述',
-    `type` VARCHAR(20) DEFAULT 'custom' COMMENT '类型: builtin(内置)/custom(自定义)',
-    `openapi_spec` JSON COMMENT 'OpenAPI 3.0规范内容',
-    `config` JSON COMMENT '配置信息(如API密钥等)',
-    `status` VARCHAR(20) DEFAULT 'disabled' COMMENT '状态: enabled(启用)/disabled(禁用)',
+    `name` VARCHAR(100) NOT NULL COMMENT '插件名称（唯一）',
+    `description` VARCHAR(500) COMMENT '插件描述',
+    `type` VARCHAR(20) DEFAULT 'custom' COMMENT '插件类型: builtin(内置)/custom(自定义)',
+    `openapi_spec` JSON COMMENT 'OpenAPI 3.0规范内容（完整的API定义）',
+    `config` JSON COMMENT '插件配置信息（API密钥、服务器地址等）',
+    `status` VARCHAR(20) DEFAULT 'disabled' COMMENT '插件状态: enabled(启用)/disabled(禁用)',
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    INDEX `idx_status` (`status`)
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `is_deleted` TINYINT(1) DEFAULT 0 COMMENT '是否删除: 0-未删除, 1-已删除',
+    UNIQUE KEY `uk_name` (`name`),
+    INDEX `idx_type` (`type`),
+    INDEX `idx_status` (`status`),
+    INDEX `idx_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='插件表';
 
 -- ============================================
