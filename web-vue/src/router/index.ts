@@ -1,7 +1,7 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import ConsoleLayout from '@/views/layout/ConsoleLayout.vue'
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 
-const routes = [
+const routes: RouteRecordRaw[] = [
   {
     path: '/',
     redirect: '/login'
@@ -20,7 +20,7 @@ const routes = [
   },
   {
     path: '/console',
-    component: ConsoleLayout,
+    component: () => import('@/views/layout/ConsoleLayout.vue'),
     meta: { requiresAuth: true },
     children: [
       {
@@ -64,17 +64,21 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  document.title = to.meta.title || '智能体创作平台'
-  const token = localStorage.getItem('token')
+router.beforeEach((to, _from, next) => {
+  document.title = (to.meta.title as string) || '智能体创作平台'
+  const userStore = useUserStore()
+  const token = userStore.token
+
   if (to.meta.requiresAuth && !token) {
     next({ path: '/login', query: { redirect: to.fullPath } })
     return
   }
+
   if ((to.path === '/login' || to.path === '/register') && token) {
     next('/console/agents')
     return
   }
+
   next()
 })
 
